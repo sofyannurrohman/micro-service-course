@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Mentor;
+use App\Models\Review;
+use App\Models\MyCourse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -68,6 +70,30 @@ class CourseController extends Controller
             "data"=> $course
         ]);
     }
+
+    public function show($id){
+
+        $course = Course::find($id);
+
+        if(!$course){
+            return response()->json([
+                "status"=> "error",
+                "message"=> "course not found"
+            ],404);
+        }
+
+        $review = Review::where("course_id", "=", $id)->get()->toArray();
+        $totalStudent= MyCourse::where("course_id","=", $id)->count();
+
+        $course['reviews'] = $review;
+        $course['total_student'] = $totalStudent;
+        return response()->json([
+            "status"=> "success",
+            "message"=> $course
+        ]);
+
+    }
+
     public function update(Request $request, $id){
         $rules = [
             "name" => "string",
